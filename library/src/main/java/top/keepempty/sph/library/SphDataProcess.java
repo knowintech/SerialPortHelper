@@ -1,13 +1,19 @@
 package top.keepempty.sph.library;
 
 import android.os.Message;
+import android.util.Log;
+
+import java.util.Arrays;
 
 /**
  * 串口数据处理
+ *
  * @author ：frey
  * @date：2019/4/03 16:15
  */
 public class SphDataProcess {
+
+    private static final String TAG = "SphDataProcess";
 
     /**
      * 记录读取数据的大小
@@ -80,8 +86,9 @@ public class SphDataProcess {
                 if (currentCommand.timeOut > 0) {
                     sphHandler.sendEmptyMessageDelayed(TIMEOUT_WHAT, currentCommand.timeOut);
                 }
+                Log.d("SphDataProcess", "writeData: " + Arrays.toString(currentCommand.commands));
                 SerialPortJNI.writePort(currentCommand.commands);
-                concurrentCom.setStatus(true);
+                concurrentCom.doneCom();
             }
         }
     }
@@ -215,6 +222,8 @@ public class SphDataProcess {
         if (concurrentCom == null) {
             concurrentCom = new SphConcurrentCom();
         }
+
+        Log.d(TAG, "addCommands: " + Arrays.toString(command.commands));
         concurrentCom.addCommands(command);
     }
 
@@ -269,10 +278,11 @@ public class SphDataProcess {
 
     /**
      * 发送串口数据到主线程
-     * @param sphCmdEntity  串口数据
-     * @param what          数据标识
+     *
+     * @param sphCmdEntity 串口数据
+     * @param what         数据标识
      */
-    private void sendMessage(SphCmdEntity sphCmdEntity,int what){
+    private void sendMessage(SphCmdEntity sphCmdEntity, int what) {
         Message message = new Message();
         message.what = what;
         message.obj = sphCmdEntity;
@@ -281,6 +291,7 @@ public class SphDataProcess {
 
     /**
      * 获取最大读取长度
+     *
      * @return
      */
     public int getMaxSize() {
@@ -293,6 +304,7 @@ public class SphDataProcess {
      */
     private static class SphHandler extends android.os.Handler {
         private SphDataProcess processingRecData;
+
         public SphHandler(SphDataProcess processingRecData) {
             this.processingRecData = processingRecData;
         }
@@ -306,12 +318,13 @@ public class SphDataProcess {
 
     /**
      * 处理数据回调
+     *
      * @param msg
      */
-    private void receiveData(Message msg){
+    private void receiveData(Message msg) {
         switch (msg.what) {
             case TIMEOUT_WHAT:
-                reWriteCmdOrExit();
+                //reWriteCmdOrExit();
                 break;
             case SENDCMD_WHAT:
                 onResultCallback.onSendData((SphCmdEntity) msg.obj);

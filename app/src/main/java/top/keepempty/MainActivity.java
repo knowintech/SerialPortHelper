@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String sendTxt = mSendDataEt.getText().toString().trim();
+                String sendTxt = "7E 0A 11 22 33 22 01 01 01 99 12 31 AA 11 22 33 FF FF 00 00 23 59 00 00 23 59 00 00 23 59 00 00 23 59 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 73 A5 E7";
                 if(TextUtils.isEmpty(sendTxt)){
                     Toast.makeText(MainActivity.this,"请输入发送命令！",Toast.LENGTH_LONG).show();
                     return;
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Toast.makeText(MainActivity.this,"命令错误！",Toast.LENGTH_LONG).show();
                     return;
                 }
-                serialPortHelper.addCommands(sendTxt);
+                serialPortHelper.addCommands(sendTxt.replace(" ",""));
             }
         });
 
@@ -201,11 +201,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(isOpen){
             Toast.makeText(this,"串口打开成功！",Toast.LENGTH_LONG).show();
             mOpenBtn.setText("关闭串口");
-            mOpenBtn.setTextColor(ContextCompat.getColor(this,R.color.org));
+            mOpenBtn.setTextColor(ContextCompat.getColor(this, R.color.org));
             mOpenBtn.setBackgroundResource(R.drawable.button_style_stroke);
         }else {
             mOpenBtn.setText("打开串口");
-            mOpenBtn.setTextColor(ContextCompat.getColor(this,R.color.white));
+            mOpenBtn.setTextColor(ContextCompat.getColor(this, R.color.white));
             mOpenBtn.setBackgroundResource(R.drawable.button_style_org);
         }
     }

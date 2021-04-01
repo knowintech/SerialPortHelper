@@ -1,13 +1,18 @@
 package top.keepempty.sph.library;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 /**
  * 串口读写命令线程同步控制
+ *
  * @author：fery
  * @date：2019/3/30 18:35
  */
 public class SphConcurrentCom {
+
+    private static final String TAG = "SphConcurrentCom";
 
     private boolean isGet;
 
@@ -20,6 +25,7 @@ public class SphConcurrentCom {
 
     /**
      * 添加串口发送命令
+     *
      * @param command 命令数据
      */
     public void addCommands(SphCmdEntity command) {
@@ -28,6 +34,7 @@ public class SphConcurrentCom {
 
     /**
      * 获取当前命令
+     *
      * @return currentCmdEntity
      */
     public SphCmdEntity getCurrentCmdEntity() {
@@ -36,6 +43,7 @@ public class SphConcurrentCom {
 
     /**
      * 判断命令是否为空
+     *
      * @return
      */
     public boolean isCmdEmpty() {
@@ -44,6 +52,7 @@ public class SphConcurrentCom {
 
     /**
      * 从命令集合中取命令数据
+     *
      * @return currentCmdEntity
      */
     public synchronized SphCmdEntity get() {
@@ -54,7 +63,9 @@ public class SphConcurrentCom {
                 e.printStackTrace();
             }
         }
+        Log.d(TAG, "mEntryList.size: " + mEntryList.size());
         currentCmdEntity = mEntryList.remove(0);
+        Log.d(TAG, "get currentCmdEntity:" + (currentCmdEntity == null));
         notify();
         return currentCmdEntity;
     }
@@ -63,7 +74,7 @@ public class SphConcurrentCom {
      * 命令接收完成
      */
     public synchronized void doneCom() {
-        if(isCmdEmpty()){
+        if (isCmdEmpty()) {
             currentCmdEntity = null;
             return;
         }
@@ -80,9 +91,10 @@ public class SphConcurrentCom {
 
     /**
      * 设置读写同步状态
+     *
      * @param status
      */
-    public void setStatus(boolean status){
+    public void setStatus(boolean status) {
         this.isGet = status;
     }
 
