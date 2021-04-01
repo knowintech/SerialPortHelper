@@ -7,7 +7,6 @@ build/
 .externalNativeBuild
 .cxx
 .idea/
-/gradle/
 *.apk
 *.ap_
 *.dex
