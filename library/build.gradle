@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.freyskill'
+apply from: "${rootProject.projectDir}/maven-config-version.gradle"
+apply from: "${rootProject.projectDir}/maven-deploy.gradle"
 android {
     compileSdkVersion 28
 
@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode VERSION_CODE.toInteger()
+        versionName VERSION_NAME
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -54,3 +54,23 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+
+allprojects {
+    tasks.withType(JavaCompile) {
+        // Warn about deprecations
+        //options.compilerArgs << '-Xlint:deprecation'
+        // Warn about unchecked usages
+        options.compilerArgs << '-Xlint:unchecked'
+        // Don't warn about using source/target 1.5 option
+        options.compilerArgs << '-Xlint:-options'
+
+        options.debug(['debugLevel': 'source,lines,vars'])
+        options.debug = VERSION_NAME.contains('SNAPSHOT')
+    }
+
+    tasks.withType(AbstractArchiveTask) {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}
+
