@@ -1,0 +1,20 @@
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: rootProject.ext.url) {
+                authentication(userName: rootProject.ext.username, password: rootProject.ext.password)
+            }
+
+            pom.project {
+                name project.name
+                version project.version
+                artifactId project.name
+                groupId project.group
+                packaging 'aar'
+                description 'xiot-485-android'
+            }
+        }
+    }
+}
