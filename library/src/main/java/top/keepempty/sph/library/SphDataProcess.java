@@ -199,7 +199,9 @@ public class SphDataProcess {
             concurrentCom.setStatus(false);
         }
         if (onResultCallback != null) {
-            sendMessage(null, COMPLETECMD_WHAT);
+            if (currentCommand != null) {
+                sendMessage(currentCommand, COMPLETECMD_WHAT);
+            }
         }
     }
 
@@ -291,6 +293,7 @@ public class SphDataProcess {
         sphHandler.sendMessage(message);
     }
 
+
     /**
      * 获取最大读取长度
      *
@@ -335,7 +338,7 @@ public class SphDataProcess {
                 onResultCallback.onReceiveData((SphCmdEntity) msg.obj);
                 break;
             case COMPLETECMD_WHAT:
-                onResultCallback.onComplete();
+                onResultCallback.onComplete((SphCmdEntity) msg.obj);
                 break;
             default:
                 break;

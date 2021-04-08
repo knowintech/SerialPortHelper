@@ -22,6 +22,6 @@ public interface SphResultCallback {
     /**
      * 发送，收取完成
      */
-    void onComplete();
+    void onComplete(SphCmdEntity sendCom);
 
 }

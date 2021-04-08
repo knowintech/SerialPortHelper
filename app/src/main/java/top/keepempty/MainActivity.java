@@ -131,10 +131,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         comEntry.commands = DataConversion.decodeHexString(sendTextArray[x]);
                         comEntry.flag = x;
                         comEntry.commandsHex = sendTextArray[x];
+                        comEntry.timeOut = 500;
                         serialPortHelper.addCommands(comEntry);
                         flag++;
                     }
-                }, 0, 600);
+                }, 0, 1500);
 
                 // serialPortHelper.addCommands(sendTxt);
             }
@@ -196,8 +197,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
             @Override
-            public void onComplete() {
-                Log.d(TAG, "完成");
+            public void onComplete(SphCmdEntity sendCom) {
+                Log.d(TAG, "完成 :"+ sendCom.commandsHex );
             }
         });
     }
