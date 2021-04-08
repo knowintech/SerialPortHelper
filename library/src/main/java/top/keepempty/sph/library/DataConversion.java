@@ -132,7 +132,6 @@ public class DataConversion {
      * @return
      */
     public static byte[] decodeHexString(String hexString) {
-        Log.d("DataConversion", "decodeHexString: " + hexString);
         if (hexString.length() % 2 == 1) {
             throw new IllegalArgumentException(
                     "Invalid hexadecimal String supplied.");
@@ -140,7 +139,6 @@ public class DataConversion {
         byte[] bytes = new byte[hexString.length() / 2];
         for (int i = 0; i < hexString.length(); i += 2) {
             bytes[i / 2] = hexToByte(hexString.substring(i, i + 2));
-            Log.d("DataConversion", "byte[" + (i / 2) + "]:" + bytes[i / 2]);
         }
         return bytes;
     }

@@ -199,10 +199,12 @@ public class SerialPortHelper {
             Log.e(TAG,"You not open device !!! ");
             return;
         }
-        // 开启写数据线程
-        sphThreads.startWriteThread();
         // 添加发送命令
         processingData.addCommands(sphCmdEntity);
+
+        // 开启写数据线程
+        sphThreads.startWriteThread();
+
 
     }
 

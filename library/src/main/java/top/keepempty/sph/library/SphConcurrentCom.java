@@ -63,9 +63,7 @@ public class SphConcurrentCom {
                 e.printStackTrace();
             }
         }
-        Log.d(TAG, "mEntryList.size: " + mEntryList.size());
         currentCmdEntity = mEntryList.remove(0);
-        Log.d(TAG, "get currentCmdEntity:" + (currentCmdEntity == null));
         notify();
         return currentCmdEntity;
     }

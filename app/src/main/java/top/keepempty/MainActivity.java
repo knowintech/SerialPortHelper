@@ -14,6 +14,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import top.keepempty.sph.library.DataConversion;
 import top.keepempty.sph.library.SerialPortConfig;
 import top.keepempty.sph.library.SerialPortFinder;
 import top.keepempty.sph.library.SerialPortHelper;
@@ -50,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String[] entryValues;
     private boolean isOpen;
     private StringBuilder receiveTxt = new StringBuilder();
+    private int flag = 0;
+    private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,34 +90,65 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mSerialPortFinder = new SerialPortFinder();
         entryValues = mSerialPortFinder.getAllDevicesPath();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-              this, android.R.layout.simple_spinner_item,
-               entryValues);
+                this, android.R.layout.simple_spinner_item,
+                entryValues);
         mPathSpinner.setAdapter(adapter);
 
         mSendBtn = findViewById(R.id.sph_sendBtn);
         mSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String sendTxt = "7E 0A 11 22 33 22 01 01 01 99 12 31 AA 11 22 33 FF FF 00 00 23 59 00 00 23 59 00 00 23 59 00 00 23 59 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 73 A5 E7";
-                if(TextUtils.isEmpty(sendTxt)){
-                    Toast.makeText(MainActivity.this,"请输入发送命令！",Toast.LENGTH_LONG).show();
+                if (timer != null) {
                     return;
                 }
-                if (sendTxt.length() % 2 == 1) {
-                    Toast.makeText(MainActivity.this,"命令错误！",Toast.LENGTH_LONG).show();
-                    return;
-                }
-                serialPortHelper.addCommands(sendTxt.replace(" ",""));
+//                String sendTxt = mSendDataEt.getText().toString().trim();
+//                ;
+//                if (TextUtils.isEmpty(sendTxt)) {
+//                    Toast.makeText(MainActivity.this, "请输入发送命令！", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+//                if (sendTxt.length() % 2 == 1) {
+//                    Toast.makeText(MainActivity.this, "命令错误！", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+                final String[] sendTextArray = {
+                        "010300010001d5ca",
+                        "01030002000125ca",
+                        "010300030001740a",
+                        "010300040001c5cb",
+                        "010300050001940b",
+                        "010300060001640b",
+                        "01030007000135cb",
+                        "01030008000105c8",
+                };
+
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        int x = flag % 8;
+                        SphCmdEntity comEntry = new SphCmdEntity();
+                        comEntry.commands = DataConversion.decodeHexString(sendTextArray[x]);
+                        comEntry.flag = x;
+                        comEntry.commandsHex = sendTextArray[x];
+                        serialPortHelper.addCommands(comEntry);
+                        flag++;
+                    }
+                }, 0, 600);
+
+                // serialPortHelper.addCommands(sendTxt);
             }
         });
 
         mOpenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isOpen){
+                if (isOpen) {
+                    timer.cancel();
+                    timer = null;
                     serialPortHelper.closeDevice();
                     isOpen = false;
-                }else{
+                } else {
                     openSerialPort();
                 }
                 showState();
@@ -122,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     /**
      * 打开串口
      */
-    private void openSerialPort(){
+    private void openSerialPort() {
 
         /**
          * 串口参数
@@ -132,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         serialPortConfig.path = path;
         serialPortConfig.baudRate = baudRate;
         serialPortConfig.dataBits = dataBits;
-        serialPortConfig.parity   = checkBits;
+        serialPortConfig.parity = checkBits;
         serialPortConfig.stopBits = stopBits;
 
 
@@ -142,18 +179,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         serialPortHelper.setConfigInfo(serialPortConfig);
         // 开启串口
         isOpen = serialPortHelper.openDevice();
-        if(!isOpen){
-            Toast.makeText(this,"串口打开失败！",Toast.LENGTH_LONG).show();
+        if (!isOpen) {
+            Toast.makeText(this, "串口打开失败！", Toast.LENGTH_LONG).show();
         }
         serialPortHelper.setSphResultCallback(new SphResultCallback() {
             @Override
             public void onSendData(SphCmdEntity sendCom) {
-                Log.d(TAG, "发送命令：" + sendCom.commandsHex);
+                Log.d(TAG, "发送命令：" + sendCom.commandsHex + " flag:" + sendCom.flag);
             }
 
             @Override
             public void onReceiveData(SphCmdEntity data) {
-                Log.d(TAG, "收到命令：" + data.commandsHex);
+                Log.d(TAG, "收到命令：" + data.commandsHex + " flag:" + data.flag);
                 receiveTxt.append(data.commandsHex).append("\n");
                 mShowReceiveTxt.setText(receiveTxt.toString());
             }
@@ -197,13 +234,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    private void showState(){
-        if(isOpen){
-            Toast.makeText(this,"串口打开成功！",Toast.LENGTH_LONG).show();
+    private void showState() {
+        if (isOpen) {
+            Toast.makeText(this, "串口打开成功！", Toast.LENGTH_LONG).show();
             mOpenBtn.setText("关闭串口");
             mOpenBtn.setTextColor(ContextCompat.getColor(this, R.color.org));
             mOpenBtn.setBackgroundResource(R.drawable.button_style_stroke);
-        }else {
+        } else {
             mOpenBtn.setText("打开串口");
             mOpenBtn.setTextColor(ContextCompat.getColor(this, R.color.white));
             mOpenBtn.setBackgroundResource(R.drawable.button_style_org);

@@ -86,7 +86,7 @@ public class SphDataProcess {
                 if (currentCommand.timeOut > 0) {
                     sphHandler.sendEmptyMessageDelayed(TIMEOUT_WHAT, currentCommand.timeOut);
                 }
-                Log.d("SphDataProcess", "writeData: " + Arrays.toString(currentCommand.commands));
+
                 SerialPortJNI.writePort(currentCommand.commands);
                 concurrentCom.doneCom();
             }
@@ -166,7 +166,10 @@ public class SphDataProcess {
             reInit();
             return;
         }
-        sendMessage(new SphCmdEntity(resultBytes), RECEIVECMD_WHAT);
+
+        SphCmdEntity cmdEntity = new SphCmdEntity(resultBytes);
+        cmdEntity.flag = currentCommand.flag;
+        sendMessage(cmdEntity, RECEIVECMD_WHAT);
         reInit();
     }
 
@@ -223,7 +226,6 @@ public class SphDataProcess {
             concurrentCom = new SphConcurrentCom();
         }
 
-        Log.d(TAG, "addCommands: " + Arrays.toString(command.commands));
         concurrentCom.addCommands(command);
     }
 
@@ -324,7 +326,7 @@ public class SphDataProcess {
     private void receiveData(Message msg) {
         switch (msg.what) {
             case TIMEOUT_WHAT:
-                //reWriteCmdOrExit();
+                reWriteCmdOrExit();
                 break;
             case SENDCMD_WHAT:
                 onResultCallback.onSendData((SphCmdEntity) msg.obj);
