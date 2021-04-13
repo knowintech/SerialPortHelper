@@ -216,7 +216,6 @@ int SerialPort::readData(BYTE *data, int size) {
         if (retval == -1) {
             LOGE("Select error!");
         } else if (retval) {
-            LOGD("This device has data!");
             ret = static_cast<int>(read(fd, data, static_cast<size_t>(size)));
         } else {
             LOGE("Select timeout!");

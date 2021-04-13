@@ -54,7 +54,7 @@ allprojects {
             }
 
             group = 'com.knowin.iot.485'
-            version = '1.0.4'
+            version = '1.0.8'
         }
     }
 }

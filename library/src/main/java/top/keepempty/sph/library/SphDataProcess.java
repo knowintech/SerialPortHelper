@@ -79,6 +79,11 @@ public class SphDataProcess {
         if (concurrentCom.getCurrentCmdEntity() == null) {
             if (!concurrentCom.isCmdEmpty()) {
                 currentCommand = concurrentCom.get();
+                if (currentCommand == null){
+                    receiveDone();
+                    return;
+                }
+
                 if (onResultCallback != null) {
                     onResultCallback.onSendData(currentCommand);
                 }
@@ -168,7 +173,10 @@ public class SphDataProcess {
         }
 
         SphCmdEntity cmdEntity = new SphCmdEntity(resultBytes);
-        cmdEntity.flag = currentCommand.flag;
+        if (currentCommand != null) {
+            cmdEntity.flag = currentCommand.flag;
+        }
+
         sendMessage(cmdEntity, RECEIVECMD_WHAT);
         reInit();
     }
