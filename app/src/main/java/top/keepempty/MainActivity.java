@@ -150,9 +150,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     serialPortHelper.closeDevice();
                     isOpen = false;
                 } else {
-                    openSerialPort();
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            openSerialPort();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showState();
+                                }
+                            });
+                        }
+                    }.start();
+//                    openSerialPort();
+//                    showState();
                 }
-                showState();
+
             }
         });
     }
@@ -181,7 +194,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // 开启串口
         isOpen = serialPortHelper.openDevice();
         if (!isOpen) {
-            Toast.makeText(this, "串口打开失败！", Toast.LENGTH_LONG).show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(MainActivity.this, "串口打开失败！", Toast.LENGTH_LONG).show();
+                }
+            });
         }
         serialPortHelper.setSphResultCallback(new SphResultCallback() {
             @Override

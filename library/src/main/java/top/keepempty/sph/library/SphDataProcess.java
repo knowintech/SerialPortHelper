@@ -1,5 +1,6 @@
 package top.keepempty.sph.library;
 
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
@@ -69,7 +70,13 @@ public class SphDataProcess {
 
     public SphDataProcess(int maxSize) {
         this.maxSize = maxSize;
-        sphHandler = new SphHandler(this);
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            Log.d(TAG, "mainThread");
+            sphHandler = new SphHandler(this);
+        } else {
+            Log.d(TAG, "not mainThread");
+            sphHandler = new SphHandler(Looper.getMainLooper(), this);
+        }
     }
 
     /**
@@ -79,7 +86,7 @@ public class SphDataProcess {
         if (concurrentCom.getCurrentCmdEntity() == null) {
             if (!concurrentCom.isCmdEmpty()) {
                 currentCommand = concurrentCom.get();
-                if (currentCommand == null){
+                if (currentCommand == null) {
                     receiveDone();
                     return;
                 }
@@ -319,6 +326,11 @@ public class SphDataProcess {
         private SphDataProcess processingRecData;
 
         public SphHandler(SphDataProcess processingRecData) {
+            this.processingRecData = processingRecData;
+        }
+
+        public SphHandler(Looper looper, SphDataProcess processingRecData){
+            super(looper);
             this.processingRecData = processingRecData;
         }
 
